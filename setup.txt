@@ -1,0 +1,13 @@
+# General utilities
+python-dotenv
+pandas
+
+# FastAPI and related libraries
+fastapi
+uvicorn[standard]
+aiohttp
+
+#docxtpl
+docxtpl
+docx
+httpx
