@@ -1,3 +1,4 @@
+from app.services.images_dowload import wp_images_crawler_controller
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request, HTTPException
 from app.services.scrapContentBlog import scrap_content_blog
@@ -154,7 +155,6 @@ async def content_blog_crawler(request: Request):
             status_code=500
         )
 
-
 @router.post("/image_craw")
 async def product_images_crawler(request: Request):
     try:
@@ -174,13 +174,29 @@ async def product_images_crawler(request: Request):
 async def wp_images_crawler(request: Request):
     try:
         data = await request.json()
-        return JSONResponse(
-            content={
-                "status": "success",
-                "message": "Data processed successfully"
-            },
-            status_code=200
-        )
+        original_list_url = data.get('original_list_url')
+        image_alt_text = data.get('image_alt_text', 'connect-quik')
+        new_translate_post = data.get('new_translate_post')
+        try:
+            result = wp_images_crawler_controller(original_list_url, image_alt_text, new_translate_post)
+            uploaded_urls = result['uploaded_urls']
+            updated_translate_post = result['updated_translate_post']
+        
+            return JSONResponse(
+                    content={
+                        "original_list_url": original_list_url,
+                        "response_list_url": uploaded_urls,
+                        "new_translate_post": updated_translate_post
+                    },
+                    status_code=200
+                )
+        except Exception as error:
+            print(f"Error during image upload: {error}")
+            return jsonify({
+                'error': 'An error occurred while processing the request.',
+                'details': str(error)
+            }), 500
     except Exception as e:
         logger.error(f"Error generating quotation: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    

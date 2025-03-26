@@ -7,25 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: automation_quotation-5tech_lark_kiotviet_automation
     ports:
-      - "8088:8088"
-    # volumes:
-    #   - app_code:/code
+      - "8011:8088"
     networks:
       - automation_network
     restart: unless-stopped
-    # playwright:
-    #   image: mcr.microsoft.com/playwright/python:v1.51.0-noble
-    #   container_name: playwright
-    #   volumes:
-    #     - app_code:/code
-    #   depends_on:
-    #     - 5tech_lark_kiotviet_automation
-    #   networks:
-    #     - automation_network
 
 networks:
   automation_network:
     driver: bridge
-
-volumes:
-  app_code:

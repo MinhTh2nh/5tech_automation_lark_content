@@ -14,3 +14,4 @@ httpx
 
 # Playwright
 playwright
+requests
