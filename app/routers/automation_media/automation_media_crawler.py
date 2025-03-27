@@ -55,16 +55,14 @@ async def technical_specification_crawler(request: Request):
 @router.post("/content_craw")
 async def content_blog_crawler(request: Request):
     try:
-        print("Content Blog Crawler")
         data = await request.json()
         url = data.get("domain_url")
         list_craw_websites = data.get("list_craw_websites")
 
         if not url:
             raise HTTPException(status_code=400, detail="Missing 'domain_url' in request.")
-        
+    
         domain_handler = None
-        print("URL: ", url)
         try:
             if 'performancenetworks' in url:
                 domain_handler = await scrap_content_blog(
@@ -78,7 +76,6 @@ async def content_blog_crawler(request: Request):
                     content_selector='.fl-row .fl-row-content-wrap .fl-row-content .fl-col-group .fl-col-small-custom-width .fl-node-content .fl-module .fl-node-content .fl-rich-text',
                 )
             elif 'https://avsystem.com' in url:
-                print("AV System")
                 domain_handler = await scrap_content_blog(
                     list_craw_websites,
                     content_selector='.body-wrapper .body-container-wrapper .body-container .container .blog-wrapper .post-wrapper',

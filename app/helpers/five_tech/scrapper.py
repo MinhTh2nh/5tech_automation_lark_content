@@ -1,7 +1,4 @@
 async def scrape_content_blog(page, url, content_selector, unwanted_selectors):
-    print("content_selector", content_selector)
-    print("unwanted_selectors", unwanted_selectors)
-
     try:
         await page.goto(url, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_load_state(state="networkidle")

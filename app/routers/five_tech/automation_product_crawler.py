@@ -14,7 +14,6 @@ async def root():
 async def product_images_crawler_5tech(request: Request):
     try:
         data = await request.json()
-        print('data...', data)
         post_title = data.get("post_title")
         link_content_crawl = data.get("link_content_crawl") 
         link_images_crawl = data.get("link_images_crawl")

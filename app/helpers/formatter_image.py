@@ -24,7 +24,6 @@ def download_image(url, new_file_name):
     """Download an image from a URL and save it locally."""
     try:
         if not url.startswith(('http://', 'https://')):
-            print(f"Skipping invalid URL: {url}")
             return {'file_path': None, 'content_type': None, 'old_url': url}
         
         response = requests.get(url, stream=True)
@@ -32,7 +31,6 @@ def download_image(url, new_file_name):
         content_type = response.headers.get('content-type')
 
         if not is_valid_image_type(content_type):
-            print(f"Skipping non-image file: {url} (Content-Type: {content_type})")
             return {'file_path': None, 'content_type': None, 'old_url': url}
 
         ext = os.path.splitext(url.split('?')[0])[1] or '.jpg'
@@ -49,7 +47,6 @@ def download_image(url, new_file_name):
             'old_url': url
         }
     except Exception as e:
-        print(f"Error downloading image: {e}")
         return {'file_path': None, 'content_type': None, 'old_url': url}
 
 def upload_image(image_data, alt_text, is_5tech):
@@ -74,7 +71,6 @@ def upload_image(image_data, alt_text, is_5tech):
         return response.json()["source_url"]
 
     except requests.exceptions.RequestException as e:
-        print(f"Error in upload_image: {e}")
         if e.response:
             print(f"Response content: {e.response.text}")
         return None

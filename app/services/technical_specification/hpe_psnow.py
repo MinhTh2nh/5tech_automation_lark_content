@@ -63,8 +63,6 @@ async def scrape_product_hpe_psnow_doc(list_craw_websites):
                         console.log(productList);
                         return productList;
                     }''')
-                    
-                    print(craw_data)
                     website['craw_data_technical_specification'] = craw_data
                     
                 except Exception as err:

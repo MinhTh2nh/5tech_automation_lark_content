@@ -2,7 +2,6 @@ from playwright.async_api import async_playwright
 import asyncio
 
 async def scrape_product_hpe_dot_com(url):
-    print(f"scrape product from {url}")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,

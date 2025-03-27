@@ -26,7 +26,6 @@ async def scrap_product_blog(
         )
         page = await browser_context.new_page()
         stealth_async(page)
-        print("Scraping product blog...")
 
         result = {
             "craw_content_blog": [],
@@ -44,7 +43,6 @@ async def scrap_product_blog(
 
         if link_content_crawl:
             if 'https://viettuans.vn' in link_content_crawl:
-                print("....................")
                 result["craw_content_blog"] = await scrape_content_blog(
                     page, 
                     url=link_content_crawl, 
