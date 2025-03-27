@@ -1,8 +1,10 @@
 async def scrape_content_blog(page, url, content_selector, unwanted_selectors):
+    print("content_selector", content_selector)
+    print("unwanted_selectors", unwanted_selectors)
+
     try:
         await page.goto(url, wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_load_state(state="networkidle")
-        await page.wait_for_selector(selector=content_selector)
 
         content = await page.evaluate('''(args) => {
             const [contentSelector, unwantedSelectors] = args;
@@ -16,7 +18,7 @@ async def scrape_content_blog(page, url, content_selector, unwanted_selectors):
 
             const extractText = (element) => {
                 let result = '';
-                element.childNodes.forEach(node => {
+                element.childNodes.forEach(node => {        
                     if (node.nodeType === Node.TEXT_NODE) {
                         result += node.textContent.trim() + ' ';
                     } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'IMG') {

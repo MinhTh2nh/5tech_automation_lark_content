@@ -39,10 +39,10 @@ async def product_images_crawler_5tech(request: Request):
                 status_code=200
             )
         except Exception as e:
-            logger.error(f"Error scraping content: {str(e)}")
+            logger.error(f"Error scraping content: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     except Exception as e:
-        logger.error(f"Error generating quotation: {str(e)}")
+        logger.error(f"Error generating quotation: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     
 @router.post("/image_craw_for_wp_media")
@@ -69,12 +69,12 @@ async def wp_images_crawler(request: Request):
                     },
                     status_code=200
                 )
-        except Exception as error:
-            print(f"Error during image upload: {error}")
-            return jsonify({
-                'error': 'An error occurred while processing the request.',
-                'details': str(error)
-            }), 500
+        except Exception as e:
+            logger.error(f"Error in wp_images_crawler: {str(e)}", exc_info=True)
+            return JSONResponse(
+                content={"error": "An error occurred while processing the request.", "details": str(e)},
+                status_code=500
+            )
     except Exception as e:
         logger.error(f"Error generating quotation: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")

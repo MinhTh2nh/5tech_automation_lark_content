@@ -1,6 +1,6 @@
 from playwright.async_api import async_playwright
-
 from app.helpers.five_tech.scrapper import scrape_content_blog, scrape_images, scrape_tech_specs
+from playwright_stealth import stealth_async
 
 async def scrap_product_blog(
     post_title,
@@ -16,11 +16,16 @@ async def scrap_product_blog(
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button','img']
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
+        browser = await p.firefox.launch(
             headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+            timeout=60000  # Increase timeout (60 seconds)
         )
-        page = await browser.new_page()
+        browser_context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        )
+        page = await browser_context.new_page()
+        stealth_async(page)
         print("Scraping product blog...")
 
         result = {
@@ -39,6 +44,7 @@ async def scrap_product_blog(
 
         if link_content_crawl:
             if 'https://viettuans.vn' in link_content_crawl:
+                print("....................")
                 result["craw_content_blog"] = await scrape_content_blog(
                     page, 
                     url=link_content_crawl, 

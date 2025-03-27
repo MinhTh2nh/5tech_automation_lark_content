@@ -1,36 +1,31 @@
 from playwright.async_api import async_playwright
+from playwright_stealth import stealth_async
 
 async def scrap_content_blog(
     list_craw_websites,
     content_selector="body div",
     unwanted_selectors=None
 ):
-    """
-    Asynchronously scrapes content from a list of websites using Playwright.
-
-    :param list_craw_websites: List of dictionaries containing URLs to scrape.
-    :param content_selector: CSS selector to extract the main content.
-    :param unwanted_selectors: List of CSS selectors for elements to remove.
-    :return: List of dictionaries containing scraped content.
-    """
     if unwanted_selectors is None:
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
+        browser = await p.firefox.launch(
             headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+            timeout=60000
         )
-        page = await browser.new_page()
-        print("Scraping content...")
+        browser_context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        )
+        page = await browser_context.new_page()
+        stealth_async(page)
 
         for website in list_craw_websites:
             url = website.get("content_blog_url")
             if not url:
-                continue  # Skip if no URL is provided
-
+                continue 
             try:
-                # Route interception to block unwanted requests
                 async def handle_route(route):
                     blocked_patterns = ['ads', 'doubleclick.net', 'googlesyndication.com']
                     if any(pattern in route.request.url for pattern in blocked_patterns):
