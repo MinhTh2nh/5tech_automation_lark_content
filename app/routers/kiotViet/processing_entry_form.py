@@ -23,7 +23,6 @@ async def process_processing_data(request: Request):
         total_order_value = request_data.get("total_order_value", "")
         order_supply_code = request_data.get("order_supply_code", "")
         order_id = request_data.get("order_id", "")
-
         # Gọi API để lấy thông tin đơn hàng
         order_data = await retrieve_order_details(token_retrieve_detail, order_id)
         
@@ -73,14 +72,17 @@ async def process_processing_data_invoice(request: Request):
     try:
         request_data = await request.json()
         # Extract necessary fields
-        reason_for_purchase = request_data.get("reason_for_purchase", "")
-        purchase_details = request_data.get("purchase_details", [])
-        token_retrieve_detail = request_data.get("token_retrieve_detail", "")
-        token_lark = request_data.get("token_lark", "")
-        customer_deposit_money = request_data.get("customer_deposit_money", "")
-        total_order_value = request_data.get("total_order_value", "")
-        customer_name = request_data.get("customer_name", "")
         order_id = request_data.get("order_id", "")
+        token_lark = request_data.get("token_lark", "")
+        contract_date = request_data.get("contract_date", "")
+        customer_name = request_data.get("customer_name", "")
+        customer_address = request_data.get("customer_address", "")
+        purchase_details = request_data.get("purchase_details", [])
+        total_order_value = request_data.get("total_order_value", "")
+        customer_tax_code = request_data.get("customer_tax_code", "")
+        reason_for_purchase = request_data.get("reason_for_purchase", "")
+        token_retrieve_detail = request_data.get("token_retrieve_detail", "")
+        customer_deposit_money = request_data.get("customer_deposit_money", "")
 
         # Gọi API để lấy thông tin đơn hàng
         order_data = await retrieve_order_details_for_invoices(token_retrieve_detail, order_id)
@@ -91,8 +93,6 @@ async def process_processing_data_invoice(request: Request):
         else:
             template_used = config.TEMPLATE_PATH
 
-        tam_ung_don_hang = format_currency(customer_deposit_money)
-        con_lai_don_hang = format_currency(total_order_value - customer_deposit_money)
         products = [
             {
                 "STT": index + 1,
@@ -115,8 +115,10 @@ async def process_processing_data_invoice(request: Request):
             "TongDonHangBangChu": number_to_vietnamese_words(int(float(total_order_value / 1.1) * 1000)),
             "ThanhToanDot1": int((customer_deposit_money / total_order_value) * 100),
             "ThanhToanDot2": 100 - int((customer_deposit_money / total_order_value) * 100),
-            "TamUngDonHang": tam_ung_don_hang,
-            "ConLaiDonHang": con_lai_don_hang,
+            "BenMua_TenCongTy": customer_name,
+            "BenMua_DiaChi": customer_address,
+            "BenMua_MaSoThue": customer_tax_code,
+            "NgayTaoHopDong": contract_date
         }
         # Generate document
         document_io = generate_and_clean_document(template_used, processed_data)
@@ -140,6 +142,7 @@ async def process_processing_data_invoice(request: Request):
                     raise HTTPException(status_code=500, detail="Failed to upload document to LarkSuite")
 
                 file_code = upload_result["data"]["code"]
+                file_url = upload_result["data"]["url"]
         final_data = {
             "form": json.dumps([  # Correctly format `form` as a JSON string
                 {
@@ -175,6 +178,7 @@ async def process_processing_data_invoice(request: Request):
                 "status": "success",
                 "message": "Data processed successfully",
                 "final_data": final_data,
+                "file_url": file_url
             },
             status_code=200
         )

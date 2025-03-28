@@ -16,7 +16,8 @@ async def scrap_content_blog(
             timeout=60000
         )
         browser_context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+            viewport={"width": 1920, "height": 1080},
         )
         page = await browser_context.new_page()
         stealth_async(page)

@@ -7,7 +7,6 @@ def generate_and_clean_document(template_path, data):
     doc = DocxTemplate(template_path)
     doc.render(data)
 
-    # Chuyển đổi thành Document object để làm sạch
     doc_io = io.BytesIO()
     doc.save(doc_io)
     doc_io.seek(0)
