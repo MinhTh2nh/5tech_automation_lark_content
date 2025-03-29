@@ -10,7 +10,7 @@ async def scrap_content_blog(
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
 
     async with async_playwright() as p:
-        browser = await p.firefox.launch(
+        browser = await p.chromium.launch(
             headless=True,
             args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
             timeout=60000
