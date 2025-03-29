@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     container_name: automation_quotation-5tech_lark_kiotviet_automation
     ports:
-      - "8011:8088"
+      - "3003:8088"
     networks:
       - automation_network
     restart: unless-stopped
