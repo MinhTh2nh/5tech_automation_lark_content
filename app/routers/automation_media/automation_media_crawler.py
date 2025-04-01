@@ -1,4 +1,4 @@
-from app.services.images_dowload import wp_images_crawler_controller
+from app.services.images_dowload import wp_images_crawler_controller, wp_images_crawler_controller_content
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request, HTTPException
 from app.services.scrapContentBlog import scrap_content_blog
@@ -74,7 +74,7 @@ async def content_blog_crawler(request: Request):
                 domain_handler = await scrap_content_blog(
                     list_craw_websites,
                     content_selector='.fl-row .fl-row-content-wrap .fl-row-content .fl-col-group .fl-col-small-custom-width .fl-node-content .fl-module .fl-node-content .fl-rich-text',
-                )
+                )   
             elif 'https://avsystem.com' in url:
                 domain_handler = await scrap_content_blog(
                     list_craw_websites,
@@ -124,6 +124,22 @@ async def content_blog_crawler(request: Request):
                     list_craw_websites,
                     content_selector='#content .layout .content .content--main',
                     unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
+                )
+            elif 'https://beambox.com/' in url:
+                domain_handler = await scrap_content_blog(
+                    list_craw_websites,
+                    content_selector='.articles .main',
+                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
+                                        '.info-line', '#sidebar-left', '#sidebar-right', '.inline-trial-cta']
+                )
+            elif 'networkcomputing' in url:
+                print("Crawling Network Computing")
+                domain_handler = await scrap_content_blog(
+                    list_craw_websites,
+                    content_selector='.brand-networkcomputing .Provider .Layout .Layout-Section .TwoColumnLayout',
+                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
+                                        '.ArticleBase-Topics', '.TwoColumnLayout-Sidebar', '.ArticleBase-Contributors', '.ArticleBase-ContributorsWrapper',
+                                        '.Resources_article', '.IirisRecommendation-Title', '.SubscribeBannerTopicPage', 'hr', '.iiris-container']
                 )
             else:
                 domain_handler = await scrap_content_blog(list_craw_websites)
@@ -175,7 +191,7 @@ async def wp_images_crawler(request: Request):
         image_alt_text = data.get('image_alt_text', 'connect-quik')
         new_translate_post = data.get('new_translate_post')
         try:
-            result = wp_images_crawler_controller(original_list_url, image_alt_text, new_translate_post)
+            result = wp_images_crawler_controller_content(original_list_url, image_alt_text, new_translate_post)
             uploaded_urls = result['uploaded_urls']
             updated_translate_post = result['updated_translate_post']
         

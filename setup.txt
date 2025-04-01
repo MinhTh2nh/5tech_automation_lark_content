@@ -13,6 +13,5 @@ docx
 httpx
 
 # Playwright
-playwright
 requests
 playwright-stealth

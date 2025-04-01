@@ -11,17 +11,16 @@ async def scrap_content_blog(
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(
-            headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-            timeout=60000
+            headless=False,
+            args=['--no-sandbox', '--disable-gpu'],
+            timeout=20000,
         )
         browser_context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
             viewport={"width": 1920, "height": 1080},
         )
         page = await browser_context.new_page()
-        stealth_async(page)
-
+        await stealth_async(page)
         for website in list_craw_websites:
             url = website.get("content_blog_url")
             if not url:
@@ -36,7 +35,7 @@ async def scrap_content_blog(
 
                 await page.route("**/*", handle_route)
 
-                await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+                await page.goto(url, wait_until="domcontentloaded", timeout=20000)
                 await page.wait_for_load_state(state="networkidle")
                 await page.wait_for_selector(selector=content_selector)
 
@@ -70,7 +69,7 @@ async def scrap_content_blog(
                     });
                     return content.trim();
                 }''', [content_selector, unwanted_selectors])
-
+                print("Finished scraping content", url)
                 website["craw_content_blog"] = [{"translatedText": extracted_content}]
 
             except Exception as scraping_err:

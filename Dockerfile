@@ -11,6 +11,4 @@ RUN apt-get update && apt-get install -y curl && \
 
 COPY . /code
 
-RUN playwright install --with-deps
-
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8088"]

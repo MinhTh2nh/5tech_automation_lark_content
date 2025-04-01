@@ -3,22 +3,14 @@ from app.helpers.five_tech.scrapper import scrape_content_blog, scrape_images, s
 
 async def scrap_product_blog(list_of_items):
     async with async_playwright() as p:
-        browser = await p.firefox.launch(
+        browser = await p.chromium.launch(
             headless=True,
-            args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
-            timeout=60000 
+            args=['--no-sandbox', '--disable-gpu'],
+            timeout=30000, 
         )
         browser_context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-            java_script_enabled=True,
-            locale="en-US",
-            timezone_id="UTC",
-            geolocation=None,
-            permissions=None,
-            extra_http_headers=None,
-            offline=False,
-            http_credentials=None,
-            is_mobile=False,
+            viewport={"width": 1920, "height": 1080},
         )
 
         results = []
@@ -86,18 +78,6 @@ async def scrap_product_blog(list_of_items):
                             '.g_luot_mua', '.detail_bar', '.single_buy_group', '.nhanvien_hotro', '#thong_so', '#ez-toc-container', 'a', 'noscript'
                         ]
                     )
-                # elif 'https://enootech.com/' in link_content_crawl:
-                #     result["craw_content_blog"] = await scrape_content_blog(
-                #         page, 
-                #         url=link_content_crawl, 
-                #         content_selector="#wrapwrap main .o_wsale_product_page", 
-                #         unwanted_selectors=[
-                #             'script', 'form', 'header', 'footer', 'style', 'img', 'a', 'noscript', '.oe_empty', '.o_wsale_product_images', '.tp-product-navigator',
-                #             '.breadcrumb', '.o_product_page_reviews_link', 'form', '#product_attributes_simple', '#cfp_pop_up', '.tp-product-info-hook', 'hr', 'tp_extra_fields o_not_editable',
-                #             '.tp_extra_fields', '.s_share', '#o_product_terms_and_share', '#wsale_user_email', 'input', '.tp-hook-product-tabs', '.tp-hook-accessory-products', '.tp-sticky-add-to-cart',
-                #             '.o_product_feature_panel', '#specifications'
-                #         ]
-                #     )
                 elif 'https://unifi.vn/' in link_content_crawl:
                     result["craw_content_blog"] = await scrape_content_blog(
                         page, 

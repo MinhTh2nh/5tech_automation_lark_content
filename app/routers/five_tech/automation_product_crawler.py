@@ -14,7 +14,7 @@ async def root():
 async def product_images_crawler_5tech(request: Request):
     try:
         data = await request.json()
-        list_of_items = data.get("list_of_items", [])
+        list_of_items = data.get("list_of_items", [])[:5]
 
         if not list_of_items:
             raise HTTPException(status_code=400, detail="list_of_items cannot be empty")
