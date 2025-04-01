@@ -32,7 +32,7 @@ def wp_images_crawler_controller(list_of_items, is_5tech=False):
             image_alt_text = sanitize_filename(raw_post_title)
             uploaded_urls = []
 
-            for i, url in enumerate(original_list_url):
+            for i, url in enumerate(original_list_url[:5]):
                 new_file_name = f"{image_alt_text}-{i + 2}".replace(' ', '-').lower()
                 image_data = download_image(url, new_file_name)
 
