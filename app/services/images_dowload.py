@@ -32,7 +32,7 @@ def wp_images_crawler_controller(list_of_items, is_5tech=False):
             image_alt_text = sanitize_filename(raw_post_title)
             uploaded_urls = []
 
-            for i, url in enumerate(original_list_url[:5]):
+            for i, url in enumerate(original_list_url[:4]):
                 new_file_name = f"{image_alt_text}-{i + 2}".replace(' ', '-').lower()
                 image_data = download_image(url, new_file_name)
 
@@ -60,8 +60,6 @@ def wp_images_crawler_controller(list_of_items, is_5tech=False):
                 'sku': sku,
                 'image_alt_text': image_alt_text,
             })
-
-
         return results
     except Exception as e:
         print(f"Error in wp_images_crawler_controller: {e}")

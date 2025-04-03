@@ -1,7 +1,7 @@
 from app.services.images_dowload import wp_images_crawler_controller, wp_images_crawler_controller_content
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request, HTTPException
-from app.services.scrapContentBlog import scrap_content_blog
+from app.services.scrapContentBlog import scrap_content_blog, scrap_content_blog_selector
 from app.utils.logging_config import logger
 from app.services.technical_specification import (
     ruijienetworks, vn_ruijienetworks, store_ui, 
@@ -140,6 +140,13 @@ async def content_blog_crawler(request: Request):
                     unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
                                         '.ArticleBase-Topics', '.TwoColumnLayout-Sidebar', '.ArticleBase-Contributors', '.ArticleBase-ContributorsWrapper',
                                         '.Resources_article', '.IirisRecommendation-Title', '.SubscribeBannerTopicPage', 'hr', '.iiris-container']
+                )
+            elif 'https://www.cnet.com' in url:
+                domain_handler = await scrap_content_blog_selector(
+                    list_craw_websites,
+                    content_selector="div[section='article-body'].g-grid-container .u-grid-columns",
+                    unwanted_selectors=["script", "iframe", "style", "noscript", "form", "footer", "header", "button",
+                                        ".c-adDisplay_container", "div[data-cy='shortcodeListicle']"]
                 )
             else:
                 domain_handler = await scrap_content_blog(list_craw_websites)

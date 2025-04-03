@@ -1,5 +1,6 @@
-from playwright.async_api import async_playwright
-from playwright_stealth import stealth_async
+from app.services.browser import initialize_browser
+from app.services.extractors import extract_page_content, extract_page_content_selector
+from app.services.product_blog.routes import handle_route
 
 async def scrap_content_blog(
     list_craw_websites,
@@ -9,72 +10,56 @@ async def scrap_content_blog(
     if unwanted_selectors is None:
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
 
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=False,
-            args=['--no-sandbox', '--disable-gpu'],
-            timeout=20000,
-        )
-        browser_context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
-            viewport={"width": 1920, "height": 1080},
-        )
-        page = await browser_context.new_page()
-        await stealth_async(page)
-        for website in list_craw_websites:
-            url = website.get("content_blog_url")
-            if not url:
-                continue 
-            try:
-                async def handle_route(route):
-                    blocked_patterns = ['ads', 'doubleclick.net', 'googlesyndication.com']
-                    if any(pattern in route.request.url for pattern in blocked_patterns):
-                        await route.abort()
-                    else:
-                        await route.continue_()
+    browser, page, playwright = await initialize_browser(headless=False)
+    
+    for website in list_craw_websites:
+        url = website.get("content_blog_url")
+        if not url:
+            continue 
+        try:
+            await page.route("**/*", handle_route)
+            await page.goto(url, wait_until="load", timeout=20000)
+            await page.wait_for_load_state(state="networkidle")
+            await page.wait_for_selector(selector=content_selector)
 
-                await page.route("**/*", handle_route)
+            extracted_content = await extract_page_content(page, content_selector, unwanted_selectors)  # Ensure this is defined
+            print("Finished scraping content", url)
+            website["craw_content_blog"] = [{"translatedText": extracted_content}]
 
-                await page.goto(url, wait_until="domcontentloaded", timeout=20000)
-                await page.wait_for_load_state(state="networkidle")
-                await page.wait_for_selector(selector=content_selector)
+        except Exception as scraping_err:
+            print(f"Scraping error for URL {url}: {scraping_err}")
+            website["craw_content_blog"] = []
+    await browser.close()
+    await playwright.stop()
+    return list_craw_websites
 
-                extracted_content = await page.evaluate('''(args) => {
-                    const [contentSelector, unwantedSelectors] = args;
-                    const elements = document.querySelectorAll(contentSelector);
-                    
-                    elements.forEach(el => {
-                        unwantedSelectors.forEach(selector => {
-                            el.querySelectorAll(selector).forEach(node => node.remove());
-                        });
-                    });
+async def scrap_content_blog_selector(
+    list_craw_websites,
+    content_selector="body div",
+    unwanted_selectors=None
+):
+    if unwanted_selectors is None:
+        unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
 
-                    const extractText = (element) => {
-                        let result = '';
-                        element.childNodes.forEach(node => {
-                            if (node.nodeType === Node.TEXT_NODE) {
-                                result += node.textContent.trim() + ' ';
-                            } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'IMG') {
-                                result += node.outerHTML;  // Keep <img> tags
-                            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                                result += extractText(node);
-                            }
-                        });
-                        return result.trim();
-                    };
+    browser, page, playwright = await initialize_browser(headless=False)
+    
+    for website in list_craw_websites:
+        url = website.get("content_blog_url")
+        if not url:
+            continue 
+        try:
+            await page.route("**/*", handle_route)
+            await page.goto(url, wait_until="load", timeout=20000)
+            await page.wait_for_load_state(state="networkidle")
+            await page.wait_for_selector(selector=content_selector)
 
-                    let content = '';
-                    elements.forEach(el => {
-                        content += extractText(el) + '\\n\\n';
-                    });
-                    return content.trim();
-                }''', [content_selector, unwanted_selectors])
-                print("Finished scraping content", url)
-                website["craw_content_blog"] = [{"translatedText": extracted_content}]
+            extracted_content = await extract_page_content_selector(page, content_selector, unwanted_selectors)  # Ensure this is defined
+            print("Finished scraping content", url)
+            website["craw_content_blog"] = [{"translatedText": extracted_content}]
 
-            except Exception as scraping_err:
-                print(f"Scraping error for URL {url}: {scraping_err}")
-                website["craw_content_blog"] = []
-
-        await browser.close()
-        return list_craw_websites
+        except Exception as scraping_err:
+            print(f"Scraping error for URL {url}: {scraping_err}")
+            website["craw_content_blog"] = []
+    await browser.close()
+    await playwright.stop()
+    return list_craw_websites
