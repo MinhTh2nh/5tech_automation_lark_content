@@ -1,7 +1,8 @@
+from app.services.content_blog.handleScrapContent import handle_scrap_content
 from app.services.images_dowload import wp_images_crawler_controller, wp_images_crawler_controller_content
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request, HTTPException
-from app.services.scrapContentBlog import scrap_content_blog, scrap_content_blog_selector
+from app.services.content_blog.scrapContentBlog import scrap_content_blog, scrap_content_blog_selector
 from app.utils.logging_config import logger
 from app.services.technical_specification import (
     ruijienetworks, vn_ruijienetworks, store_ui, 
@@ -56,117 +57,11 @@ async def technical_specification_crawler(request: Request):
 async def content_blog_crawler(request: Request):
     try:
         data = await request.json()
-        url = data.get("domain_url")
-        list_craw_websites = data.get("list_craw_websites")
-
-        if not url:
-            raise HTTPException(status_code=400, detail="Missing 'domain_url' in request.")
-    
-        domain_handler = None
-        try:
-            if 'performancenetworks' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.main-content .row .post-content .row_col_wrap_12',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
-                )
-            elif 'https://myplace.app' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.fl-row .fl-row-content-wrap .fl-row-content .fl-col-group .fl-col-small-custom-width .fl-node-content .fl-module .fl-node-content .fl-rich-text',
-                )   
-            elif 'https://avsystem.com' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.body-wrapper .body-container-wrapper .body-container .container .blog-wrapper .post-wrapper',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button', '.blog-post__contact-banner', '.blog-post__share']
-                )
-            elif 'https://pocketstop.com' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.post-template-default .site-container',
-                    unwanted_selectors=['script', 'form', 'header', 'footer', 'style', '.blog-post__share', '.blog-post__contact-banner', '.contact-section', '.rp4wp-related-posts', '.date-category', '.sidebar']
-                )
-            elif 'https://connect.quik.vn' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.e-con-inner .max-width-blog .e-child',
-                )
-            elif 'https://www.searchenginejournal.com' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.post-template-default #main-content .container-lg .row .s-post-section article.post',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
-                                        '.module', '.channel', '.bottom-cat narrow-cont', '.sej-article-head byline', '.sej-under-post sej-under-post_1']
-                )
-            elif 'https://martech.org' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.template-article .page-container .main-container-wrap .container-fluid .content .row .article-content',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
-                                        '.module', '.channel', '.dateline', '#st-1', '.google-news-link',
-                                        '.body-content .row', 'em']
-                )
-            elif 'digitalagencynetwork' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.post-template-default #wrapper .thb-page-main-content-container .thb-page-content-container-left .main-post',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button', '.thb-post-bottom-single']
-                )
-            elif 'https://www.mywifinetworks.com' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.post-template-default #page .site-content .elementor-section-wrap .elementor-section .elementor-widget-wrap',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button', '.module', '.elementor-col-33']
-                )
-            elif 'https://mailchimp.com' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='#content .layout .content .content--main',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
-                )
-            elif 'https://beambox.com/' in url:
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.articles .main',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
-                                        '.info-line', '#sidebar-left', '#sidebar-right', '.inline-trial-cta']
-                )
-            elif 'networkcomputing' in url:
-                print("Crawling Network Computing")
-                domain_handler = await scrap_content_blog(
-                    list_craw_websites,
-                    content_selector='.brand-networkcomputing .Provider .Layout .Layout-Section .TwoColumnLayout',
-                    unwanted_selectors=['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button',
-                                        '.ArticleBase-Topics', '.TwoColumnLayout-Sidebar', '.ArticleBase-Contributors', '.ArticleBase-ContributorsWrapper',
-                                        '.Resources_article', '.IirisRecommendation-Title', '.SubscribeBannerTopicPage', 'hr', '.iiris-container']
-                )
-            elif 'https://www.cnet.com' in url:
-                domain_handler = await scrap_content_blog_selector(
-                    list_craw_websites,
-                    content_selector="div[section='article-body'].g-grid-container .u-grid-columns",
-                    unwanted_selectors=["script", "iframe", "style", "noscript", "form", "footer", "header", "button",
-                                        ".c-adDisplay_container", "div[data-cy='shortcodeListicle']"]
-                )
-            else:
-                domain_handler = await scrap_content_blog(list_craw_websites)
-
-            list_craw_websites = domain_handler
-
-            return JSONResponse(
-                content={"content_blog_url": url, "list_craw_websites": list_craw_websites},
-                status_code=200
-            )
-
-        except Exception as crawl_error:
-            logger.error(f"Error during crawling for URL {url}: {str(crawl_error)}", exc_info=True)
-            logger.info(f"URL: {url}")
-            logger.info(f"URL---------: {url}")
-            logger.error(crawl_error)
-            return JSONResponse(
-                content={"error": "Crawling failed.", "details": str(crawl_error)},
-                status_code=500
-            )
+        list_of_items = data.get("list_of_items", [])
+        if not list_of_items:
+            raise HTTPException(status_code=400, detail="list_of_items cannot be empty")
+        results = await handle_scrap_content(list_of_items)
+        return JSONResponse(content={"scraped_results": results}, status_code=200)
 
     except Exception as e:
         logger.error(f"Error in content_blog_crawler: {str(e)}", exc_info=True)

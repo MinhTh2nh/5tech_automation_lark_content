@@ -4,14 +4,12 @@ from app.services.product_blog.routes import handle_route
 
 async def scrap_content_blog(
     list_craw_websites,
+    page,
     content_selector="body div",
     unwanted_selectors=None
 ):
     if unwanted_selectors is None:
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
-
-    browser, page, playwright = await initialize_browser(headless=True)
-    
     for website in list_craw_websites:
         url = website.get("content_blog_url")
         if not url:
@@ -29,19 +27,16 @@ async def scrap_content_blog(
         except Exception as scraping_err:
             print(f"Scraping error for URL {url}: {scraping_err}")
             website["craw_content_blog"] = []
-    await browser.close()
-    await playwright.stop()
     return list_craw_websites
 
 async def scrap_content_blog_selector(
     list_craw_websites,
+    page,
     content_selector="body div",
     unwanted_selectors=None
 ):
     if unwanted_selectors is None:
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
-
-    browser, page, playwright = await initialize_browser(headless=False)
     
     for website in list_craw_websites:
         url = website.get("content_blog_url")
@@ -60,6 +55,4 @@ async def scrap_content_blog_selector(
         except Exception as scraping_err:
             print(f"Scraping error for URL {url}: {scraping_err}")
             website["craw_content_blog"] = []
-    await browser.close()
-    await playwright.stop()
     return list_craw_websites
