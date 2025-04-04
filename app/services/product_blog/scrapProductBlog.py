@@ -3,7 +3,7 @@ from app.services.browser import initialize_browser_without_stealth
 from app.services.product_blog.routes import handle_route
 
 async def scrap_product_blog(list_of_items):
-        browser, page, playwright = await initialize_browser_without_stealth(headless=False)
+        browser, page, playwright = await initialize_browser_without_stealth(headless=True)
         results = []
 
         for item in list_of_items:

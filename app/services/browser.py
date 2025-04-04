@@ -1,7 +1,7 @@
 from playwright.async_api import async_playwright
 from playwright_stealth import stealth_async
 
-async def initialize_browser(headless=True):
+async def initialize_browser(headless=False):
     playwright = await async_playwright().start()
     browser = await playwright.chromium.launch(
         headless=headless,
@@ -14,7 +14,7 @@ async def initialize_browser(headless=True):
     await stealth_async(page)
     return browser, page, playwright
 
-async def initialize_browser_without_stealth(headless=True):
+async def initialize_browser_without_stealth(headless=False):
     playwright = await async_playwright().start() 
     browser = await playwright.chromium.launch(
         headless=headless,

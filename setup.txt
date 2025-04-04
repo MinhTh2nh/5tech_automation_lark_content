@@ -15,4 +15,3 @@ httpx
 # Playwright
 requests
 playwright-stealth
-playwright

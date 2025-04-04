@@ -10,7 +10,7 @@ async def scrap_content_blog(
     if unwanted_selectors is None:
         unwanted_selectors = ['script', 'iframe', 'style', 'noscript', 'form', 'footer', 'header', 'button']
 
-    browser, page, playwright = await initialize_browser(headless=False)
+    browser, page, playwright = await initialize_browser(headless=True)
     
     for website in list_craw_websites:
         url = website.get("content_blog_url")
